@@ -1,7 +1,11 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
     namespace 'com.github.a7med7official.main_library'
@@ -32,10 +36,34 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            MainLibrary(MavenPublication) {
+                from components.release
+                groupId "com.github.a7med7official"
+                artifactId "main_library"
+                version "1.0.0"
+            }
+        }
+
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/a7med7official/multi-module-library")
+                credentials {
+                    username = "${properties.getProperty('GITHUB_USERNAME')}"
+                    password = "${properties.getProperty('GITHUB_PASSWORD')}"
+                }
+            }
+        }
+    }
 }
